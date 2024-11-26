@@ -1,0 +1,40 @@
+{
+  "ParkedVehicles": [
+    {
+      "ZoneCode": "A1",
+      "Vehicle": {
+        "RegNumber": "ABC123"
+      },
+      "StartTime": "2024-11-20T10:30:00",
+      "EndTime": "2024-11-20T11:00:00",
+      "Cost": 15.0
+    },
+    {
+      "ZoneCode": "B2",
+      "Vehicle": {
+        "RegNumber": "XYZ987"
+      },
+      "StartTime": "2024-11-20T12:00:00",
+      "EndTime": null,
+      "Cost": 0.0
+    },
+    {
+      "ZoneCode": "C3",
+      "Vehicle": {
+        "RegNumber": "LMN456"
+      },
+      "StartTime": "2024-11-20T09:15:00",
+      "EndTime": "2024-11-20T10:45:00",
+      "Cost": 45.0
+    },
+    {
+      "ZoneCode": "D4",
+      "Vehicle": {
+        "RegNumber": "DEF789"
+      },
+      "StartTime": "2024-11-20T08:00:00",
+      "EndTime": "2024-11-20T09:30:00",
+      "Cost": 45.0
+    }
+  ]
+}
