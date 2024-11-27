@@ -117,11 +117,11 @@ public class ParkingService
         }
 
         var table = new Table();
-        table.AddColumn("Zone Code");
+        table.AddColumn("[bold cyan]Zone Code[/]");
         table.AddColumn("Registration Number");
         table.AddColumn("Start Time");
         table.AddColumn("End Time");
-        table.AddColumn("Cost (SEK)");
+        table.AddColumn("[bold red]Cost (SEK)[/]");
 
         foreach (var parking in Parkings)
         {
@@ -131,7 +131,7 @@ public class ParkingService
             // Hantera pågående parkering och beräkna kostnaden baserat på den aktuella tiden
             if (!parking.EndTime.HasValue)
             {
-                cost = (DateTime.Now - parking.StartTime).TotalMinutes * 0.5; // Beräkna kostnaden för pågående parkering
+                cost = (DateTime.Now - parking.StartTime).TotalMinutes * 0.01; // Beräkna kostnaden för pågående parkering
             }
 
             table.AddRow(parking.ZoneCode, parking.Vehicle.RegNumber, parking.StartTime.ToString(), endTime, cost.ToString("F2"));
