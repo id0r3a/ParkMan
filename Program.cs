@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Collections.Generic;
 using Spectre.Console;
 using Figgle;
+using NemoPark;
 
 namespace NemoPark
 {
@@ -11,12 +12,20 @@ namespace NemoPark
         static void Main(string[] args)
         {
             string dataJSONFilePath = "ParkedVehicles.json";
-            string allDataAsJSONType = File.ReadAllText(dataJSONFilePath);
+            RootObject<Vehicle>? myDataBase = null;
 
-            RootObject myDataBase = JsonSerializer.Deserialize<RootObject>(allDataAsJSONType)!;
+            try
+            {
+                string allDataAsJSONType = File.ReadAllText(dataJSONFilePath);
+                myDataBase = JsonSerializer.Deserialize<RootObject<Vehicle>>(allDataAsJSONType);
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.MarkupLine($"[red]Failed to read or deserialize JSON file: {ex.Message}[/]");
+            }
 
-            ParkingService parkingService = new ParkingService();
-            parkingService.Parkings = myDataBase.ParkedVehicles ?? new List<Parking>();
+            var parkingService = new ParkingService<Vehicle>();
+            parkingService.Parkings = myDataBase?.ParkedVehicles ?? new List<Parking<Vehicle>>();
 
             bool keepRunning = true;
 
@@ -26,22 +35,21 @@ namespace NemoPark
 
             while (keepRunning)
             {
-                //AnsiConsole.MarkupLine("[bold cyan]Welcome to the Parking Management System![/]");
-                //AnsiConsole.MarkupLine("[cyan]Please choose an option:[/]");
                 var choice = AnsiConsole.Prompt(
                     new SelectionPrompt<string>()
-                        .Title("[bold green]Choose your action:[/]")
-                        .AddChoices("Park", "Check out", "Show all parkings", "Exit")
+                        .Title("[bold green]Choose an action:[/]")
+                        .AddChoices("Start parking", "Check out", "Show all parkings", "Exit")
                 );
 
                 switch (choice)
                 {
-                    case "Park":
+                    case "Start parking":
                         var zoneCode = AnsiConsole.Ask<string>("[cyan]Enter zone code:[/]").ToLower();
                         var regNumber = AnsiConsole.Ask<string>("[cyan]Enter vehicle registration number:[/]").ToLower();
-                        parkingService.StartParking(zoneCode, regNumber);
-                        parkingService.SaveData(dataJSONFilePath, new RootObject { ParkedVehicles = parkingService.Parkings });
-                        Pause();
+                        var vehicle = new Vehicle(regNumber);
+                        parkingService.StartParking(zoneCode, vehicle);
+                        parkingService.SaveData(dataJSONFilePath, new RootObject<Vehicle> { ParkedVehicles = parkingService.Parkings });
+                        ConsoleHelper.Pause();
                         break;
 
                     case "Check out":
@@ -59,12 +67,12 @@ namespace NemoPark
                         {
                             AnsiConsole.MarkupLine("[red]Check out cancelled.[/]");
                         }
-                        Pause();
+                        ConsoleHelper.Pause();
                         break;
 
                     case "Show all parkings":
                         parkingService.ShowParkings();
-                        Pause();
+                        ConsoleHelper.Pause();
                         break;
 
                     case "Exit":
@@ -77,13 +85,6 @@ namespace NemoPark
                         break;
                 }
             }
-        }
-
-        static void Pause()
-        {
-            AnsiConsole.MarkupLine("\n[blue]Press any key to continue...[/]");
-            Console.ReadKey();
-            Console.Clear();
         }
     }
 }

@@ -1,14 +1,15 @@
-﻿using System;
+﻿using NemoPark;
+using System;
 
-public class Parking
+public class Parking<T> where T : IIdentifiable<string>
 {
     public string ZoneCode { get; set; }
-    public Vehicle Vehicle { get; set; }
+    public T Vehicle { get; set; }
     public DateTime StartTime { get; set; }
     public DateTime? EndTime { get; set; } // Nullable för att hantera pågående parkeringar
     public double Cost { get; set; }
 
-    public Parking(string zoneCode, Vehicle vehicle)
+    public Parking(string zoneCode, T vehicle)
     {
         ZoneCode = zoneCode.ToLower(); // Normalisera till små bokstäver
         Vehicle = vehicle;
@@ -23,6 +24,6 @@ public class Parking
     public void EndParking()
     {
         EndTime = DateTime.Now; // Sätt sluttid till nu när parkeringen slutar
-        Cost = (EndTime.Value - StartTime).TotalMinutes * 0.1; // Exempel på kostnad: 0.5 SEK per minut
+        Cost = (EndTime.Value - StartTime).TotalMinutes * 0.5; // Exempel på kostnad: 0.5 SEK per minut
     }
 }
