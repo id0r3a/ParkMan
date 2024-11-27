@@ -78,23 +78,58 @@ public class ParkingService<T> where T : IIdentifiable<string>
             parking.EndParking();
             AnsiConsole.MarkupLine($"[green]Parking for vehicle {regNumber} ended successfully.[/]");
             AnsiConsole.MarkupLine($"[yellow]Total cost: {parking.Cost} SEK.[/]");
+
             var paymentMethod = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
                     .Title("[yellow]How would you like to pay?[/]")
                     .AddChoices("Swish", "Card")
             );
+
             switch (paymentMethod.ToLower())
             {
                 case "swish":
-                    var phoneNumber = AnsiConsole.Ask<string>("[cyan]Enter your Swish number:[/]");
+                    string phoneNumber;
+                    do
+                    {
+                        phoneNumber = AnsiConsole.Ask<string>("[cyan]Enter your Swish number (must start with '07' and be exactly 10 digits long):[/]");
+                        if (!IsValidSwishNumber(phoneNumber))
+                        {
+                            AnsiConsole.Clear();
+                            AnsiConsole.MarkupLine("[red]Invalid Swish number. The number must start with '07' and contain exactly 10 digits.[/]");
+                        }
+                    }
+                    while (!IsValidSwishNumber(phoneNumber));
                     AnsiConsole.MarkupLine($"[green]Payment completed via Swish using phone number {phoneNumber}.[/]");
                     break;
+
                 case "card":
-                    var cardNumber = AnsiConsole.Ask<string>("[cyan]Enter your card number:[/]");
-                    var expiryDate = AnsiConsole.Ask<string>("[cyan]Enter your card expiry date (MM/YY):[/]");
+                    string cardNumber;
+                    do
+                    {
+                        cardNumber = AnsiConsole.Ask<string>("[cyan]Enter your card number:[/]");
+                        if (cardNumber.Length != 14 || !long.TryParse(cardNumber, out _))
+                        {
+                            AnsiConsole.Clear();
+                            AnsiConsole.MarkupLine("[red]Invalid card number. It must always be a 14-digit number.[/]");
+                        }
+                    }
+                    while (cardNumber.Length != 14 || !long.TryParse(cardNumber, out _));
+
+                    string expiryDate;
+                    do
+                    {
+                        expiryDate = AnsiConsole.Ask<string>("[cyan]Enter your card expiry date (MM/YY):[/]");
+                        if (!ValidateExpiryDate(expiryDate))
+                        {
+                            AnsiConsole.Clear();
+                        }
+                    }
+                    while (!ValidateExpiryDate(expiryDate));
+
                     var cvv = AnsiConsole.Ask<string>("[cyan]Enter your card CVV (3-digit code):[/]");
                     AnsiConsole.MarkupLine("[green]Payment completed via card.[/]");
                     break;
+
                 default:
                     AnsiConsole.MarkupLine("[red]Invalid payment method.[/]");
                     break;
@@ -106,6 +141,31 @@ public class ParkingService<T> where T : IIdentifiable<string>
             AnsiConsole.MarkupLine($"[red]No active parking found for vehicle {regNumber}.[/]");
         }
     }
+
+    // Valideringsfunktion för utgångsdatum
+    private bool ValidateExpiryDate(string expiryDate)
+    {
+        if (DateTime.TryParseExact(expiryDate, "MM/yy", null, System.Globalization.DateTimeStyles.None, out var parsedDate))
+        {
+            // Kontrollera att månaden är mellan 1 och 12
+            if (parsedDate.Month < 1 || parsedDate.Month > 12)
+            {
+                AnsiConsole.MarkupLine("[red]Invalid expiry date. The month must be between 01 and 12.[/]");
+                return false;
+            }
+            // Kontrollera att utgångsdatumet inte är tidigare än den nuvarande månaden
+            return parsedDate >= new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        }
+        AnsiConsole.MarkupLine("[red]Invalid expiry date format. Please use this format MM/YY.[/]");
+        return false;
+    }
+
+    // Valideringsfunktion för Swish-nummer
+    private bool IsValidSwishNumber(string phoneNumber)
+    {
+        return phoneNumber.StartsWith("07") && phoneNumber.Length == 10 && long.TryParse(phoneNumber, out _);
+    }
+
 
     // Visa alla parkeringar
     public void ShowParkings()
@@ -131,7 +191,7 @@ public class ParkingService<T> where T : IIdentifiable<string>
             // Hantera pågående parkering och beräkna kostnaden baserat på den aktuella tiden
             if (!parking.EndTime.HasValue)
             {
-                cost = (DateTime.Now - parking.StartTime).TotalMinutes * 0.01; // Beräkna kostnaden för pågående parkering
+                cost = (DateTime.Now - parking.StartTime).TotalMinutes * 0.001; // Beräkna kostnaden för pågående parkering
             }
 
             table.AddRow(parking.ZoneCode, parking.Vehicle.Id, parking.StartTime.ToString(), endTime, cost.ToString("F2"));
