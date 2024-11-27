@@ -3,15 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Spectre.Console;
+using NemoPark;
 
-public class ParkingService
+public class ParkingService<T> where T : IIdentifiable<string>
 {
-    public List<Parking> Parkings { get; set; }
+    public List<Parking<T>> Parkings { get; set; }
     private readonly string filePath = "ParkedVehicles.json"; // Filen där parkeringarna lagras
 
     public ParkingService()
     {
-        Parkings = new List<Parking>(); // Initiera med tom lista
+        Parkings = new List<Parking<T>>(); // Initiera med tom lista
         LoadParkings();
     }
 
@@ -23,7 +24,7 @@ public class ParkingService
             try
             {
                 var json = File.ReadAllText(filePath);
-                var data = JsonConvert.DeserializeObject<RootObject>(json); // Deserialize till RootObject
+                var data = JsonConvert.DeserializeObject<RootObject<T>>(json); // Deserialize till RootObject
                 if (data?.ParkedVehicles != null)
                 {
                     Parkings.AddRange(data.ParkedVehicles);
@@ -45,7 +46,7 @@ public class ParkingService
     }
 
     // Spara parkeringar till JSON-fil
-    public void SaveData(string filePath, RootObject myDataBase)
+    public void SaveData(string filePath, RootObject<T> myDataBase)
     {
         myDataBase.ParkedVehicles = Parkings;
         var json = JsonConvert.SerializeObject(myDataBase, Formatting.Indented);
@@ -53,20 +54,19 @@ public class ParkingService
     }
 
     // Starta parkering
-    public void StartParking(string zoneCode, string regNumber)
+    public void StartParking(string zoneCode, T vehicle)
     {
-        var vehicle = new Vehicle(regNumber.ToLower());
-        var parking = new Parking(zoneCode.ToLower(), vehicle);
+        var parking = new Parking<T>(zoneCode.ToLower(), vehicle);
         parking.StartParking();
         Parkings.Add(parking);
-        SaveData(filePath, new RootObject { ParkedVehicles = Parkings }); // Spara parkeringen i JSON-filen
-        AnsiConsole.MarkupLine($"[green]Vehicle {regNumber} parked at {parking.StartTime} in zone {zoneCode}.[/]");
+        SaveData(filePath, new RootObject<T> { ParkedVehicles = Parkings }); // Spara parkeringen i JSON-filen
+        AnsiConsole.MarkupLine($"[green]Vehicle {vehicle.Id} parked at {parking.StartTime} in zone {zoneCode}.[/]");
     }
 
     // Check out
     public void CheckOutByRegNumber(string regNumber, string filePath)
     {
-        var parking = Parkings.Find(p => p.Vehicle.RegNumber.ToLower() == regNumber.ToLower());
+        var parking = Parkings.Find(p => p.Vehicle.Id.ToLower() == regNumber.ToLower());
         if (parking != null)
         {
             if (parking.EndTime != null)
@@ -99,7 +99,7 @@ public class ParkingService
                     AnsiConsole.MarkupLine("[red]Invalid payment method.[/]");
                     break;
             }
-            SaveData(filePath, new RootObject { ParkedVehicles = Parkings }); // Uppdatera och spara parkeringen i JSON
+            SaveData(filePath, new RootObject<T> { ParkedVehicles = Parkings }); // Uppdatera och spara parkeringen i JSON
         }
         else
         {
@@ -134,7 +134,7 @@ public class ParkingService
                 cost = (DateTime.Now - parking.StartTime).TotalMinutes * 0.01; // Beräkna kostnaden för pågående parkering
             }
 
-            table.AddRow(parking.ZoneCode, parking.Vehicle.RegNumber, parking.StartTime.ToString(), endTime, cost.ToString("F2"));
+            table.AddRow(parking.ZoneCode, parking.Vehicle.Id, parking.StartTime.ToString(), endTime, cost.ToString("F2"));
         }
 
         AnsiConsole.Write(table);
