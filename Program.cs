@@ -5,7 +5,7 @@ using Spectre.Console;
 using Figgle;
 using NemoPark;
 
-namespace NemoPark
+namespace ParkMan
 {
     public class Program
     {
