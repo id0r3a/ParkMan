@@ -87,13 +87,15 @@ public class ParkingService<T> where T : IIdentifiable<string>
             {
                 case "swish":
                     var phoneNumber = AnsiConsole.Ask<string>("[cyan]Enter your Swish number:[/]");
-                    AnsiConsole.MarkupLine($"[green]Payment completed via Swish using phone number {phoneNumber}.[/]");
+                    AnsiConsole.MarkupLine($"[Green]Thank you for your payment.[/]");
+                    AnsiConsole.MarkupLine($"[White]We look forward to serving you again![/]");
                     break;
                 case "card":
                     var cardNumber = AnsiConsole.Ask<string>("[cyan]Enter your card number:[/]");
                     var expiryDate = AnsiConsole.Ask<string>("[cyan]Enter your card expiry date (MM/YY):[/]");
                     var cvv = AnsiConsole.Ask<string>("[cyan]Enter your card CVV (3-digit code):[/]");
-                    AnsiConsole.MarkupLine("[green]Payment completed via card.[/]");
+                    AnsiConsole.MarkupLine("[Green]Thank you for your payment.[/]");
+                    AnsiConsole.MarkupLine($"[White]We look forward to serving you again![/]");
                     break;
                 default:
                     AnsiConsole.MarkupLine("[red]Invalid payment method.[/]");

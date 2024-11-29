@@ -38,12 +38,12 @@ namespace ParkMan
                 var choice = AnsiConsole.Prompt(
                     new SelectionPrompt<string>()
                         .Title("[bold green]Choose an action:[/]")
-                        .AddChoices("Start parking", "Check out", "Show all parkings", "Exit")
+                        .AddChoices("Park", "Check out", "Show all parkings", "Exit")
                 );
 
                 switch (choice)
                 {
-                    case "Start parking":
+                    case "Park":
                         var zoneCode = AnsiConsole.Ask<string>("[cyan]Enter zone code:[/]").ToLower();
                         var regNumber = AnsiConsole.Ask<string>("[cyan]Enter vehicle registration number:[/]").ToLower();
                         var vehicle = new Vehicle(regNumber);
