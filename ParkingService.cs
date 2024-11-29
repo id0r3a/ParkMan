@@ -88,6 +88,11 @@ public class ParkingService<T> where T : IIdentifiable<string>
             switch (paymentMethod.ToLower())
             {
                 case "swish":
+
+                    var phoneNumber = AnsiConsole.Ask<string>("[cyan]Enter your Swish number:[/]");
+                    AnsiConsole.MarkupLine($"[Green]Thank you for your payment.[/]");
+                    AnsiConsole.MarkupLine($"[White]We look forward to serving you again![/]");
+
                     string phoneNumber;
                     do
                     {
@@ -100,6 +105,7 @@ public class ParkingService<T> where T : IIdentifiable<string>
                     }
                     while (!IsValidSwishNumber(phoneNumber));
                     AnsiConsole.MarkupLine($"[green]Payment completed via Swish using phone number {phoneNumber}.[/]");
+
                     break;
 
                 case "card":
@@ -127,7 +133,8 @@ public class ParkingService<T> where T : IIdentifiable<string>
                     while (!ValidateExpiryDate(expiryDate));
 
                     var cvv = AnsiConsole.Ask<string>("[cyan]Enter your card CVV (3-digit code):[/]");
-                    AnsiConsole.MarkupLine("[green]Payment completed via card.[/]");
+                    AnsiConsole.MarkupLine("[Green]Thank you for your payment.[/]");
+                    AnsiConsole.MarkupLine($"[White]We look forward to serving you again![/]");
                     break;
 
                 default:
