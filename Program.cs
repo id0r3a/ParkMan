@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Collections.Generic;
 using Spectre.Console;
 using Figgle;
-using NemoPark;
+using ParkMan;
 
 namespace ParkMan
 {
