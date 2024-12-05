@@ -24,7 +24,7 @@ public class ParkingService<T> where T : IIdentifiable<string>
             try
             {
                 var json = File.ReadAllText(filePath);
-                var data = JsonConvert.DeserializeObject<RootObject<T>>(json); // Deserialize till RootObject
+                var data = JsonConvert.DeserializeObject<ParkingData<T>>(json); // Deserialize till RootObject
                 if (data?.ParkedVehicles != null)
                 {
                     Parkings.AddRange(data.ParkedVehicles);
@@ -46,7 +46,7 @@ public class ParkingService<T> where T : IIdentifiable<string>
     }
 
     // Spara parkeringar till JSON-fil
-    public void SaveData(string filePath, RootObject<T> myDataBase)
+    public void SaveData(string filePath, ParkingData<T> myDataBase)
     {
         myDataBase.ParkedVehicles = Parkings;
         var json = JsonConvert.SerializeObject(myDataBase, Formatting.Indented);
@@ -59,7 +59,7 @@ public class ParkingService<T> where T : IIdentifiable<string>
         var parking = new Parking<T>(zoneCode.ToLower(), vehicle);
         parking.StartParking();
         Parkings.Add(parking);
-        SaveData(filePath, new RootObject<T> { ParkedVehicles = Parkings }); // Spara parkeringen i JSON-filen
+        SaveData(filePath, new ParkingData<T> { ParkedVehicles = Parkings }); // Spara parkeringen i JSON-filen
         AnsiConsole.MarkupLine($"[green]Vehicle {vehicle.Id} parked at {parking.StartTime} in zone {zoneCode}.[/]");
     }
 
@@ -101,7 +101,7 @@ public class ParkingService<T> where T : IIdentifiable<string>
                     AnsiConsole.MarkupLine("[red]Invalid payment method.[/]");
                     break;
             }
-            SaveData(filePath, new RootObject<T> { ParkedVehicles = Parkings }); // Uppdatera och spara parkeringen i JSON
+            SaveData(filePath, new ParkingData<T> { ParkedVehicles = Parkings }); // Uppdatera och spara parkeringen i JSON
         }
         else
         {
