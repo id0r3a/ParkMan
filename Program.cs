@@ -12,12 +12,12 @@ namespace ParkMan
         static void Main(string[] args)
         {
             string dataJSONFilePath = "ParkedVehicles.json";
-            RootObject<Vehicle>? myDataBase = null;
+            ParkingData<Vehicle>? myDataBase = null;
 
             try
             {
                 string allDataAsJSONType = File.ReadAllText(dataJSONFilePath);
-                myDataBase = JsonSerializer.Deserialize<RootObject<Vehicle>>(allDataAsJSONType);
+                myDataBase = JsonSerializer.Deserialize<ParkingData<Vehicle>>(allDataAsJSONType);
             }
             catch (Exception ex)
             {
@@ -48,7 +48,7 @@ namespace ParkMan
                         var regNumber = AnsiConsole.Ask<string>("[cyan]Enter vehicle registration number:[/]").ToLower();
                         var vehicle = new Vehicle(regNumber);
                         parkingService.StartParking(zoneCode, vehicle);
-                        parkingService.SaveData(dataJSONFilePath, new RootObject<Vehicle> { ParkedVehicles = parkingService.Parkings });
+                        parkingService.SaveData(dataJSONFilePath, new ParkingData<Vehicle> { ParkedVehicles = parkingService.Parkings });
                         ConsoleHelper.Pause();
                         break;
 
