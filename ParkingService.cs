@@ -100,8 +100,8 @@ public class ParkingService<T> where T : IIdentifiable<string>
                     }
                     while (!IsValidSwishNumber(phoneNumber));
 
-                    AnsiConsole.MarkupLine($"[green]Payment completed via Swish using phone number {phoneNumber}.[/]");
-                    AnsiConsole.MarkupLine("[white]Thank you for your payment! We look forward to serving you again![/]");
+                    AnsiConsole.MarkupLine($"[green]Thank you for your payment![/]");
+                    AnsiConsole.MarkupLine("[white]We look forward to serving you again![/]");
                     break;
 
                 case "card":
@@ -128,9 +128,21 @@ public class ParkingService<T> where T : IIdentifiable<string>
                     }
                     while (!ValidateExpiryDate(expiryDate));
 
-                    var cvv = AnsiConsole.Ask<string>("[cyan]Enter your card CVV (3-digit code):[/]");
-                    AnsiConsole.MarkupLine("[Green]Thank you for your payment.[/]");
-                    AnsiConsole.MarkupLine($"[White]We look forward to serving you again![/]");
+                    string cvv;
+                    do
+                    {
+                        cvv = AnsiConsole.Ask<string>("[cyan]Enter your card CVV (3-digit code):[/]");
+                        if (cvv.Length != 3 || !int.TryParse(cvv, out _))
+                        {
+                            AnsiConsole.Clear();
+                            AnsiConsole.MarkupLine("[red]Invalid CVV. It must be a 3-digit number.[/]");
+                        }
+                    }
+                    while (cvv.Length != 3 || !int.TryParse(cvv, out _));
+
+                    AnsiConsole.MarkupLine("[green]Thank you for your payment![/]");
+                    AnsiConsole.MarkupLine("[white]We look forward to serving you again![/]");
+
                     break;
 
                 default:
