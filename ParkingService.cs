@@ -88,24 +88,20 @@ public class ParkingService<T> where T : IIdentifiable<string>
             switch (paymentMethod.ToLower())
             {
                 case "swish":
-
-                    var phoneNumber = AnsiConsole.Ask<string>("[cyan]Enter your Swish number:[/]");
-                    AnsiConsole.MarkupLine($"[Green]Thank you for your payment.[/]");
-                    AnsiConsole.MarkupLine($"[White]We look forward to serving you again![/]");
-
                     string phoneNumber;
                     do
                     {
-                        phoneNumber = AnsiConsole.Ask<string>("[cyan]Enter your Swish number (must start with '07' and be exactly 10 digits long):[/]");
-                        if (!IsValidSwishNumber(phoneNumber))
+                        phoneNumber = AnsiConsole.Ask<string>("[cyan]Enter your Swish number:[/]");
+                        if (phoneNumber.Length != 10 || !long.TryParse(phoneNumber, out _));
                         {
                             AnsiConsole.Clear();
                             AnsiConsole.MarkupLine("[red]Invalid Swish number. The number must start with '07' and contain exactly 10 digits.[/]");
                         }
                     }
                     while (!IsValidSwishNumber(phoneNumber));
-                    AnsiConsole.MarkupLine($"[green]Payment completed via Swish using phone number {phoneNumber}.[/]");
 
+                    AnsiConsole.MarkupLine($"[green]Payment completed via Swish using phone number {phoneNumber}.[/]");
+                    AnsiConsole.MarkupLine("[white]Thank you for your payment! We look forward to serving you again![/]");
                     break;
 
                 case "card":
